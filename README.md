@@ -1,5 +1,6 @@
-# Nullifier ![](https://raw.githubusercontent.com/65-7a/nullifier/meta/icon256.png)
-A Minecraft Forge mod adding a single block: the nullifier.  
-The nullifier immediately destroys any items inside it.
+# Nullifier
 
-![](https://raw.githubusercontent.com/65-7a/nullifier/1.16.x/src/main/resources/assets/nullifier/textures/guis/nullifier_bg.png)
+A [Minecraft Forge](https://minecraftforge.net/) mod adding a single block: the nullifier.  
+The nullifier immediately destroys any items inside it.
+<br><br><br>
+![Image](https://raw.githubusercontent.com/65-7a/nullifier/meta/icon256.png)
