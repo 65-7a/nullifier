@@ -1,0 +1,16 @@
+modLoader = "javafml" #mandatory
+loaderVersion = "[36,)" #mandatory
+license = "MIT"
+#issueTrackerURL="http://my.issue.tracker/" #optional
+[[mods]] #mandatory
+modId = "nullifier" #mandatory
+version = "${file.jarVersion}" #mandatory
+displayName = "Nullifier" #mandatory
+#updateJSONURL="http://myurl.me/" #optional
+#displayURL="http://example.com/" #optional
+#logoFile="nullifier.png" #optional
+#credits="Thanks for this example mod goes to Java" #optional
+authors = "65_7a" #optional
+description = '''
+A simple mod adding one block: the nullifier.
+'''

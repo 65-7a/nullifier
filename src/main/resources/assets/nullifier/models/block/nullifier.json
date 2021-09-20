@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "nullifier:blocks/nullifier_top_bottom",
+    "side": "nullifier:blocks/nullifier_sides"
+  }
+}
