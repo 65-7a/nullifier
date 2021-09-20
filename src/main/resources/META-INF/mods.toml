@@ -1,13 +1,13 @@
 modLoader = "javafml" #mandatory
 loaderVersion = "[37,)" #mandatory
 license = "MIT"
-#issueTrackerURL="http://my.issue.tracker/" #optional
+issueTrackerURL="https://github.com/65-7a/nullifier/issues/" #optional
 [[mods]] #mandatory
 modId = "nullifier" #mandatory
 version = "${file.jarVersion}" #mandatory
 displayName = "Nullifier" #mandatory
 #updateJSONURL="http://myurl.me/" #optional
-#displayURL="http://example.com/" #optional
+displayURL="https://www.curseforge.com/minecraft/mc-mods/nullifier/" #optional
 logoFile="icon.png" #optional
 #credits="Thanks for this example mod goes to Java" #optional
 authors = "65_7a" #optional
