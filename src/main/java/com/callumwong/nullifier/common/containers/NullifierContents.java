@@ -13,29 +13,30 @@
 package com.callumwong.nullifier.common.containers;
 
 import com.callumwong.nullifier.core.interfaces.Notify;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Predicate;
 
-public class NullifierContents implements IInventory {
+public class NullifierContents implements Container {
     /**
      * Use this constructor to create a NullifierContents which is linked to its parent TileEntity.
      * On the server, this link will be used by the Container to request information and provide notifications to the parent
      * On the client, the link will be unused.
      * There are additional notificationLambdas available; these two are explicitly specified because your TileEntity will
-     *   nearly always need to implement at least these two
-     * @param size  the max number of ItemStacks in the inventory
+     * nearly always need to implement at least these two
+     *
+     * @param size                           the max number of ItemStacks in the inventory
      * @param canPlayerAccessInventoryLambda the function that the container should call in order to decide if the given player
      *                                       can access the container's contents not.  Usually, this is a check to see
      *                                       if the player is closer than 8 blocks away.
-     * @param markDirtyNotificationLambda  the function that the container should call in order to tell the parent TileEntity
-     *                                     that the contents of its inventory have been changed and need to be saved.  Usually,
-     *                                     this is TileEntity::markDirty
+     * @param markDirtyNotificationLambda    the function that the container should call in order to tell the parent TileEntity
+     *                                       that the contents of its inventory have been changed and need to be saved.  Usually,
+     *                                       this is TileEntity::markDirty
      * @return the new ChestContents.
      */
-    public static NullifierContents createForTileEntity(int size, Predicate<PlayerEntity> canPlayerAccessInventoryLambda, Notify markDirtyNotificationLambda) {
+    public static NullifierContents createForTileEntity(int size, Predicate<Player> canPlayerAccessInventoryLambda, Notify markDirtyNotificationLambda) {
         return new NullifierContents(size, canPlayerAccessInventoryLambda, markDirtyNotificationLambda);
     }
 
@@ -43,14 +44,15 @@ public class NullifierContents implements IInventory {
      * Use this constructor to create a FurnaceZoneContents which is not linked to any parent TileEntity; i.e. is used by the client side container:
      * * does not permanently store items
      * * cannot ask questions/provide notifications to a parent TileEntity
-     * @param size  the max number of ItemStacks in the inventory
+     *
+     * @param size the max number of ItemStacks in the inventory
      * @return the new ChestContents
      */
     public static NullifierContents createForClientSideContainer(int size) {
         return new NullifierContents(size);
     }
 
-    public void setCanPlayerAccessInventoryLambda(Predicate<PlayerEntity> canPlayerAccessInventoryLambda) {
+    public void setCanPlayerAccessInventoryLambda(Predicate<Player> canPlayerAccessInventoryLambda) {
         this.canPlayerAccessInventoryLambda = canPlayerAccessInventoryLambda;
     }
 
@@ -67,7 +69,7 @@ public class NullifierContents implements IInventory {
     }
 
     @Override
-    public boolean stillValid(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         return canPlayerAccessInventoryLambda.test(player);
     }
 
@@ -82,12 +84,12 @@ public class NullifierContents implements IInventory {
     }
 
     @Override
-    public void startOpen(PlayerEntity player) {
+    public void startOpen(Player player) {
         openInventoryNotificationLambda.invoke();
     }
 
     @Override
-    public void stopOpen(PlayerEntity player) {
+    public void stopOpen(Player player) {
         closeInventoryNotificationLambda.invoke();
     }
 
@@ -137,15 +139,18 @@ public class NullifierContents implements IInventory {
         this.nullifierContents = new ReadOnlyItemStackHandler(size);
     }
 
-    private NullifierContents(int size, Predicate<PlayerEntity> canPlayerAccessInventoryLambda, Notify markDirtyNotificationLambda) {
+    private NullifierContents(int size, Predicate<Player> canPlayerAccessInventoryLambda, Notify markDirtyNotificationLambda) {
         this.nullifierContents = new ReadOnlyItemStackHandler(size);
         this.canPlayerAccessInventoryLambda = canPlayerAccessInventoryLambda;
         this.markDirtyNotificationLambda = markDirtyNotificationLambda;
     }
 
-    private Predicate<PlayerEntity> canPlayerAccessInventoryLambda = x -> true;
-    private Notify markDirtyNotificationLambda = () -> {};
-    private Notify openInventoryNotificationLambda = () -> {};
-    private Notify closeInventoryNotificationLambda = () -> {};
+    private Predicate<Player> canPlayerAccessInventoryLambda = x -> true;
+    private Notify markDirtyNotificationLambda = () -> {
+    };
+    private Notify openInventoryNotificationLambda = () -> {
+    };
+    private Notify closeInventoryNotificationLambda = () -> {
+    };
     private final ReadOnlyItemStackHandler nullifierContents;
 }

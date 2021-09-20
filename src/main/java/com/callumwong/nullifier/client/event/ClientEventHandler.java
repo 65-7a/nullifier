@@ -14,7 +14,7 @@ package com.callumwong.nullifier.client.event;
 
 import com.callumwong.nullifier.client.screens.NullifierContainerScreen;
 import com.callumwong.nullifier.core.event.EventHandler;
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -24,6 +24,6 @@ public class ClientEventHandler {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onClientStartup(FMLClientSetupEvent event) {
-        ScreenManager.register(EventHandler.nullifierContainerType, NullifierContainerScreen::new);
+        MenuScreens.register(EventHandler.nullifierContainerType, NullifierContainerScreen::new);
     }
 }

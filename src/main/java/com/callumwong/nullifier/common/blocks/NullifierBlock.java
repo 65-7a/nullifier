@@ -13,64 +13,60 @@
 package com.callumwong.nullifier.common.blocks;
 
 import com.callumwong.nullifier.common.tiles.NullifierTileEntity;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import com.callumwong.nullifier.core.event.EventHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class NullifierBlock extends ContainerBlock {
-    public NullifierBlock(AbstractBlock.Properties properties) {
+public class NullifierBlock extends BaseEntityBlock {
+    public NullifierBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return newBlockEntity(world);
-    }
-
-    @Nullable
-    @Override
-    public TileEntity newBlockEntity(IBlockReader world) {
-        return new NullifierTileEntity();
-    }
-
-    // Not required.
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState blockState) {
+        return new NullifierTileEntity(pos, blockState);
     }
 
     @Override
-    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
-        if (world.isClientSide()) return ActionResultType.SUCCESS; // on client side, don't do anything
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult rayTraceResult) {
+        if (world.isClientSide()) return InteractionResult.SUCCESS; // on client side, don't do anything
 
-        INamedContainerProvider namedContainerProvider = this.getMenuProvider(state, world, pos);
+        MenuProvider namedContainerProvider = this.getMenuProvider(state, world, pos);
         if (namedContainerProvider != null) {
-            if (!(player instanceof ServerPlayerEntity)) return ActionResultType.FAIL;  // should always be true, but just in case...
-            ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity)player;
-            NetworkHooks.openGui(serverPlayerEntity, namedContainerProvider, (packetBuffer) -> {});
+            if (!(player instanceof ServerPlayer))
+                return InteractionResult.FAIL;  // should always be true, but just in case...
+            ServerPlayer serverPlayer = (ServerPlayer) player;
+            NetworkHooks.openGui(serverPlayer, namedContainerProvider, (packetBuffer) -> {
+            });
         }
 
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     // required because the default (super method) is INVISIBLE for BlockContainers.
     @Override
-    public BlockRenderType getRenderShape(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> blockEntityType) {
+        return createTickerHelper(blockEntityType, EventHandler.nullifierTileEntityType, world.isClientSide ? null : NullifierTileEntity::serverTick);
     }
 }

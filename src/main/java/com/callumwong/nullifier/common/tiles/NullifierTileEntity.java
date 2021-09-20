@@ -15,41 +15,47 @@ package com.callumwong.nullifier.common.tiles;
 import com.callumwong.nullifier.common.containers.NullifierContainer;
 import com.callumwong.nullifier.common.containers.NullifierContents;
 import com.callumwong.nullifier.core.event.EventHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BellBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class NullifierTileEntity extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
+public class NullifierTileEntity extends BlockEntity implements MenuProvider {
     public static final int NUMBER_OF_SLOTS = 9;
 
     private final NullifierContents nullifierContents;
-    private LazyOptional<IItemHandlerModifiable> inventoryHandlerLazyOptional;
+    private final LazyOptional<IItemHandlerModifiable> inventoryHandlerLazyOptional;
 
-    public NullifierTileEntity() {
-        super(EventHandler.nullifierTileEntityType);
+    public NullifierTileEntity(BlockPos pos, BlockState state) {
+        super(EventHandler.nullifierTileEntityType, pos, state);
         nullifierContents = NullifierContents.createForTileEntity(NUMBER_OF_SLOTS, this::canPlayerAccessInventory, this::setChanged);
 
         this.inventoryHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(nullifierContents));
     }
 
-    public boolean canPlayerAccessInventory(PlayerEntity player) {
+    public boolean canPlayerAccessInventory(Player player) {
         if (this.level.getBlockEntity(this.worldPosition) != this) return false;
         final double X_CENTRE_OFFSET = 0.5;
         final double Y_CENTRE_OFFSET = 0.5;
@@ -59,56 +65,77 @@ public class NullifierTileEntity extends TileEntity implements INamedContainerPr
     }
 
     @Override
-    public void tick() {
-        if (level.isClientSide()) return;
-
-        if (!nullifierContents.isEmpty()) {
-            nullifierContents.clearContent();
-            setChanged();
-        }
+    public CompoundTag save(CompoundTag tag) {
+        super.save(tag);
+        return tag;
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT nbt) {
-        super.save(nbt);
-        return nbt;
-    }
-
-    @Override
-    public void load(BlockState state, CompoundNBT nbt) {
-        super.load(state, nbt);
+    public void load(CompoundTag tag) {
+        super.load(tag);
     }
 
     @Nullable
     @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        CompoundNBT updateTagDescribingTileEntityState = getUpdateTag();
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        CompoundTag updateTagDescribingTileEntityState = getUpdateTag();
         final int METADATA = 42;
-        return new SUpdateTileEntityPacket(this.worldPosition, METADATA, updateTagDescribingTileEntityState);
+        return new ClientboundBlockEntityDataPacket(this.worldPosition, METADATA, updateTagDescribingTileEntityState);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        CompoundNBT updateTagDescribingTileEntityState = pkt.getTag();
+    public void deserializeNBT(CompoundTag nbt) {
+        super.deserializeNBT(nbt);
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        return super.serializeNBT();
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket pkt) {
+        CompoundTag updateTagDescribingTileEntityState = pkt.getTag();
         BlockState blockState = level.getBlockState(worldPosition);
-        handleUpdateTag(blockState, updateTagDescribingTileEntityState);
+        handleUpdateTag(updateTagDescribingTileEntityState);
     }
 
     @Override
-    public CompoundNBT getUpdateTag() {
-        CompoundNBT nbtTagCompound = new CompoundNBT();
+    public CompoundTag getUpdateTag() {
+        CompoundTag nbtTagCompound = new CompoundTag();
         save(nbtTagCompound);
         return nbtTagCompound;
     }
 
     @Override
-    public void handleUpdateTag(BlockState blockState, CompoundNBT tag) {
-        load(blockState, tag);
+    public void handleUpdateTag(CompoundTag tag) {
+        load(tag);
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new TranslationTextComponent("container.nullifier.nullifier");
+    public void onLoad() {
+        super.onLoad();
+    }
+
+    @Override
+    public AABB getRenderBoundingBox() {
+        return super.getRenderBoundingBox();
+    }
+
+    @Override
+    public void requestModelDataUpdate() {
+        super.requestModelDataUpdate();
+    }
+
+    @Nonnull
+    @Override
+    public IModelData getModelData() {
+        return super.getModelData();
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return new TranslatableComponent("container.nullifier.nullifier");
     }
 
     /**
@@ -116,7 +143,7 @@ public class NullifierTileEntity extends TileEntity implements INamedContainerPr
      */
     @Nullable
     @Override
-    public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player player) {
         return NullifierContainer.createContainerServerSide(windowID, playerInventory, nullifierContents);
     }
 
@@ -131,9 +158,24 @@ public class NullifierTileEntity extends TileEntity implements INamedContainerPr
         return super.getCapability(cap, side);
     }
 
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
+        return super.getCapability(cap);
+    }
+
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
         inventoryHandlerLazyOptional.invalidate();
+    }
+
+    public static void serverTick(Level world, BlockPos pos, BlockState state, NullifierTileEntity tileEntity) {
+        if (tileEntity.getLevel().isClientSide()) return;
+
+        if (!tileEntity.nullifierContents.isEmpty()) {
+            tileEntity.nullifierContents.clearContent();
+            setChanged(world, pos, state);
+        }
     }
 }

@@ -13,17 +13,18 @@
 package com.callumwong.nullifier.client.screens;
 
 import com.callumwong.nullifier.common.containers.NullifierContainer;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-public class NullifierContainerScreen extends ContainerScreen<NullifierContainer> {
+public class NullifierContainerScreen extends AbstractContainerScreen<NullifierContainer> {
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation("nullifier", "textures/guis/nullifier_bg.png");
 
-    public NullifierContainerScreen(NullifierContainer nullifierContainer, PlayerInventory playerInventory, ITextComponent title) {
+    public NullifierContainerScreen(NullifierContainer nullifierContainer, Inventory playerInventory, Component title) {
         super(nullifierContainer, playerInventory, title);
     }
 
@@ -33,18 +34,19 @@ public class NullifierContainerScreen extends ContainerScreen<NullifierContainer
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderTooltip(matrixStack, mouseX, mouseY);
+    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(stack);
+        super.render(stack, mouseX, mouseY, partialTicks);
+        this.renderTooltip(stack, mouseX, mouseY);
     }
 
-    protected void renderBg(MatrixStack p_230450_1_, float p_230450_2_, int p_230450_3_, int p_230450_4_) {
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bind(BACKGROUND_TEXTURE);
+    protected void renderBg(PoseStack stack, float p_230450_2_, int p_230450_3_, int p_230450_4_) {
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
 
         int edgeSpacingX = (this.width - this.imageWidth) / 2;
         int edgeSpacingY = (this.height - this.imageHeight) / 2;
-        this.blit(p_230450_1_, edgeSpacingX, edgeSpacingY, 0, 0, this.imageWidth, this.imageHeight);
+        this.blit(stack, edgeSpacingX, edgeSpacingY, 0, 0, this.imageWidth, this.imageHeight);
     }
 }

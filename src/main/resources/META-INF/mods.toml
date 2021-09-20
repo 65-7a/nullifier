@@ -1,5 +1,5 @@
 modLoader = "javafml" #mandatory
-loaderVersion = "[36,)" #mandatory
+loaderVersion = "[37,)" #mandatory
 license = "MIT"
 #issueTrackerURL="http://my.issue.tracker/" #optional
 [[mods]] #mandatory
@@ -13,4 +13,5 @@ logoFile="icon.png" #optional
 authors = "65_7a" #optional
 description = '''
 A simple mod adding one block: the nullifier.
+
 '''

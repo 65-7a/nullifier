@@ -14,20 +14,21 @@ package com.callumwong.nullifier.common.containers;
 
 import com.callumwong.nullifier.common.tiles.NullifierTileEntity;
 import com.callumwong.nullifier.core.event.EventHandler;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class NullifierContainer extends Container {
-    private NullifierContents nullifierContents;
+public class NullifierContainer extends AbstractContainerMenu {
+    private final NullifierContents nullifierContents;
 
-    public static NullifierContainer createContainerServerSide(int windowID, PlayerInventory playerInventory, NullifierContents nullifierContents) {
+    public static NullifierContainer createContainerServerSide(int windowID, Inventory playerInventory, NullifierContents nullifierContents) {
         return new NullifierContainer(windowID, playerInventory, nullifierContents);
     }
 
-    public static NullifierContainer createContainerClientSide(int windowID, PlayerInventory playerInventory, net.minecraft.network.PacketBuffer extraData) {
+    public static NullifierContainer createContainerClientSide(int windowID, Inventory playerInventory, FriendlyByteBuf extraData) {
         NullifierContents nullifierContents = NullifierContents.createForClientSideContainer(NULLIFIER_SLOT_COUNT);
 
         return new NullifierContainer(windowID, playerInventory, nullifierContents);
@@ -50,7 +51,7 @@ public class NullifierContainer extends Container {
 
     private static final int NULLIFIER_SLOT_COUNT = NullifierTileEntity.NUMBER_OF_SLOTS;
 
-    public NullifierContainer(int windowID, PlayerInventory invPlayer, NullifierContents nullifierContents) {
+    public NullifierContainer(int windowID, Inventory invPlayer, NullifierContents nullifierContents) {
         super(EventHandler.nullifierContainerType, windowID);
         if (EventHandler.nullifierContainerType == null)
             throw new IllegalStateException("Must initialise containerTypeContainerFurnace before constructing a ContainerFurnace!");
@@ -59,31 +60,31 @@ public class NullifierContainer extends Container {
         nullifierContents.startOpen(invPlayer.player);
 
         // Add the nullifier slots
-        for(int x = 0; x < 3; ++x) {
-            for(int y = 0; y < 3; ++y) {
+        for (int x = 0; x < 3; ++x) {
+            for (int y = 0; y < 3; ++y) {
                 this.addSlot(new Slot(nullifierContents, x + y * 3, 62 + y * 18, 17 + x * 18));
             }
         }
 
         // Add the player's inventory
-        for(int k = 0; k < 3; ++k) {
-            for(int i1 = 0; i1 < 9; ++i1) {
+        for (int k = 0; k < 3; ++k) {
+            for (int i1 = 0; i1 < 9; ++i1) {
                 this.addSlot(new Slot(invPlayer, i1 + k * 9 + 9, 8 + i1 * 18, 84 + k * 18));
             }
         }
 
         // Add the player's hotbar
-        for(int l = 0; l < 9; ++l) {
+        for (int l = 0; l < 9; ++l) {
             this.addSlot(new Slot(invPlayer, l, 8 + l * 18, 142));
         }
     }
 
     @Override
-    public boolean stillValid(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         return nullifierContents.stillValid(player);
     }
 
-    public ItemStack quickMoveStack(PlayerEntity player, int sourceSlotIndex) {
+    public ItemStack quickMoveStack(Player player, int sourceSlotIndex) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(sourceSlotIndex);
         if (slot != null && slot.hasItem()) {
@@ -112,7 +113,7 @@ public class NullifierContainer extends Container {
     }
 
     @Override
-    public void removed(PlayerEntity player) {
+    public void removed(Player player) {
         super.removed(player);
         this.nullifierContents.stopOpen(player);
     }
