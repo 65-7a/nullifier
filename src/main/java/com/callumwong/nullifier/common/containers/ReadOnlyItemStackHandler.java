@@ -28,4 +28,10 @@ public class ReadOnlyItemStackHandler extends ItemStackHandler {
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         return ItemStack.EMPTY;
     }
+
+    @Nonnull
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+        return ItemStack.EMPTY;
+    }
 }

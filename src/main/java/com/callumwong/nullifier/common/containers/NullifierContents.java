@@ -98,9 +98,9 @@ public class NullifierContents implements IInventory {
 
     @Override
     public boolean isEmpty() {
-        for (int i = 0; i < nullifierContents.getSlots(); ++i) {
-            if (!nullifierContents.getStackInSlot(i).isEmpty()) return false;
-        }
+//        for (int i = 0; i < nullifierContents.getSlots(); ++i) {
+//            if (!nullifierContents.getStackInSlot(i).isEmpty()) return false;
+//        }
 
         return true;
     }

@@ -23,7 +23,6 @@ import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.text.ITextComponent;
@@ -36,7 +35,7 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nullable;
 
-public class NullifierTileEntity extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
+public class NullifierTileEntity extends TileEntity implements INamedContainerProvider {
     public static final int NUMBER_OF_SLOTS = 9;
 
     private final NullifierContents nullifierContents;
@@ -56,16 +55,6 @@ public class NullifierTileEntity extends TileEntity implements INamedContainerPr
         final double Z_CENTRE_OFFSET = 0.5;
         final double MAXIMUM_DISTANCE_SQ = 8.0 * 8.0;
         return player.distanceToSqr(worldPosition.getX() + X_CENTRE_OFFSET, worldPosition.getY() + Y_CENTRE_OFFSET, worldPosition.getZ() + Z_CENTRE_OFFSET) < MAXIMUM_DISTANCE_SQ;
-    }
-
-    @Override
-    public void tick() {
-        if (level.isClientSide()) return;
-
-        if (!nullifierContents.isEmpty()) {
-            nullifierContents.clearContent();
-            setChanged();
-        }
     }
 
     @Override
