@@ -63,10 +63,4 @@ public class NullifierBlock extends BaseEntityBlock {
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> blockEntityType) {
-        return createTickerHelper(blockEntityType, EventHandler.nullifierTileEntityType, world.isClientSide ? null : NullifierTileEntity::serverTick);
-    }
 }

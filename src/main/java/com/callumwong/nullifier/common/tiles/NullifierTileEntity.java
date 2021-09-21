@@ -158,24 +158,9 @@ public class NullifierTileEntity extends BlockEntity implements MenuProvider {
         return super.getCapability(cap, side);
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
-        return super.getCapability(cap);
-    }
-
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
         inventoryHandlerLazyOptional.invalidate();
-    }
-
-    public static void serverTick(Level world, BlockPos pos, BlockState state, NullifierTileEntity tileEntity) {
-        if (tileEntity.getLevel().isClientSide()) return;
-
-        if (!tileEntity.nullifierContents.isEmpty()) {
-            tileEntity.nullifierContents.clearContent();
-            setChanged(world, pos, state);
-        }
     }
 }
